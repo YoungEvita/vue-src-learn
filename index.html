@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        {{ message }}
+    </div>
+  
+</body>
+<script>
+    // console.log(app)
+    // Vue.config.silent = true
+    // var vm = new Vue({
+    //     el: '#app',
+    //     data: {
+    //         message: 'Hello world!'
+    //     }
+    // })
+    // console.log(app)
+    // console.log(vm.message) // Hello world
+    // vm.message = 'Fine. Thank you'
+    // console.log(vm.message) // Fine. Thank you
+    // console.log(vm.$data) //
+    // console.log(vm.$options.data.call(this).message) // Fine. Thank you
+
+    // 步骤拆解
+    // 1. 拿到模板
+    // 2. 拿到数据
+    // 3. 模板和数据结合得到HTML DOM元素
+    // 4. 放到页面中
+
+    //1.
+    let tempNode = document.querySelector("#app")
+    // 2.
+    let data = {
+        message: 'Hello world ！！'
+    }
+    // 3. 将数据中放到模板中
+    // 递归
+    // 现在demo是DOM元素，vue 源码里是字符串 DOM-》字符串-》抽象语法数=》Vnode - 》 真正的DOM
+    let reg = /\{\{(.+?)\}\}/g // ? 取消贪婪模式
+    function complier(template, data) {
+        let childNodes =  template.childNodes
+        for (let i = 0 ; i < childNodes.length; i++) {
+            const type = childNodes[i].nodeType // 1 - 元素， 3 - 文本
+            if (type === 3) {
+                let text = childNodes[i].nodeValue // 该属性只有文本结点才有
+                text = text.replace(reg, function(_, group1) { // 函数第0个参数匹配到的内容， 返回值就是要替换的东西， g 就是匹配到的第一个元组
+                    const key = group1.trim() // 这个就是双花括号中的
+                    const value = data[key]
+                    return value
+                })
+
+                // text 现在和FDOM没有关系
+
+                childNodes[i].nodeValue = text
+            } else if (type === 1) {
+                complier(childNodes[i], data)
+            }
+        }
+    }
+    let copyNode = tempNode.cloneNode(true) // DOM 元素可直接克隆
+    console.log(tempNode)
+    // complier(tempNode, data)
+    complier(copyNode, data)
+    console.log(copyNode) // 这样没有生成新的template， 直接在页面中更新数据， DOM是引用 类型， 这样模板就没有了
+
+    // 4.
+    app.parentNode.replaceChild(copyNode, app)
+
+     // 问题：
+     // vue 使用虚拟dom， 数据属性单层级 vue 使用大量层级{{child.name.firstname}}, vue 使用构造函数，代码没有整合
+</script>
+</html>
