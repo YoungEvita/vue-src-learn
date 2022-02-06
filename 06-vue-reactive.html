@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>响应式原理</title>
+</head>
+<body>
+    
+</body>
+<script>
+    /* eg1 */
+    var obj = {}
+    obj.name = 'zhangsan'
+    Object.defineProperty(obj, 'age', {
+        configurable: true,
+        writable: true,
+        enumerable: true,
+        value: 17
+    })
+
+    // set get 
+    // 要响应式表示在赋值和读取的时候，附带的要做额外的事情
+    // 如果同时使用get和set 需要一个中间变量存储真正的数据,这样有一个问题这个会被暴露在全局作用域
+    let realGender
+    Object.defineProperty(obj, 'gender', {
+        configurable: true,
+        // writable: true, // 使用set 不可同时使用wirtable
+        enumerable: true,
+        get() {
+            console.log('get gender')
+            return realGender
+        },
+        set (newValue) {
+            realGender = newValue
+            console.log('set gender', newValue)
+        }
+    })
+
+    obj.gender = 'F'
+
+     /* eg2 */
+    // 在vue中使用 defineReactive(target, key, value, enumerable)
+    var o = {
+        name: 'andy',
+        age: 17,
+        gender: 'F'
+    }
+
+    function defineReactive(target, key, value, enumerable) {
+        // 函数内部就是一个局部作用域，这个value 就只在函数内部使用的变量
+
+        if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+           // 非数组的引用类型
+           reactify(value) 
+        }
+        Object.defineProperty(target, key, {
+            configurable: true,
+            enumerable: !!enumerable,
+            get () {
+                console.log(`读取o的${key}属性`)
+                return value
+            },
+            set (newVal) {
+                console.log(`设置o的${key}属性`)
+                value = newVal
+            }
+        })
+    }
+
+    // 将对象转换为响应式的
+    Object.keys(o).forEach(key => {
+        defineReactive(o, key, o[key], true)
+    })
+
+     /* eg3 */
+    // 实际开发中对象一般是有多级
+    // 处了递归可以使用队列（深度优先转换为广度优先）
+    let data = {
+        name: 'zhangsan',
+        course: [{
+            name: 'English'
+        }, {
+            name: 'Math'
+        }, {
+            name: 'Chinese'
+        }],
+        favor: {
+            name: 'football'
+        }
+    }
+    
+    // 将对象响应化
+    function reactify(obj) {
+        let keys = Object.keys(obj)
+
+        for (let i = 0; i< keys.length; i++) {
+            let key = keys[i] // 属性名
+            let value = obj[key]
+            // 判断这个属性是不是引用类型， 是不是数组
+            // 如果是引用类型要递归
+            // 无论是否是引用类型与否，都需要将其响应式化
+            // 如果是数字，就需要循环数组，然后讲述组里的元素进行响应式化
+
+            if (Array.isArray(value)) {
+                for (let j = 0; j < value.length; j++) {
+                    reactify(value[j])
+                }
+            } else {
+                defineReactive(obj, key, value, true)
+            }
+        }
+    }
+
+    reactify(data)
+
+    /* eg4 扩展函数功能 */
+    //  使用临时的函数名来存储函数
+    //  重新定义原来的函数
+    //  定义扩展的功能
+    //  调用临时的那个函数
+</script>
+</html>

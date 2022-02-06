@@ -1,3 +1,4 @@
+
 # 记录vue源码学习笔记
 [vue源码分析视频](https://www.bilibili.com/video/BV1LE411e7HE?p=6&spm_id_from=pageDriver)
 
@@ -89,5 +90,38 @@
     - 将虚拟DOM缓存起来，生个一个函数，函数只要传入数据，就可以得到真正的DOM
 
 # 响应式原理
+
+- 在使用vue的时候，赋值属性，货代属性都是使用的vue实例
+
+- 在设置属性值的时候，页面的数据需要更新
+
+```
+Object.defineProperty(obj, prop, {
+    writalbe
+    configurable
+    enumerable
+    value
+    set () {}
+    get () {}
+})
+```
+
+- 一般属性都是多层级的，使用递归来响应式化，对数组进行处理
+
+- push，pop， shift， unshift， reverse， sort， splice
+
+1、在改变数组的数据的时候要发出通知
+
+2、vue2 中，数组发生变化，设置length 没法通知，vue 3使用proxy解决了此问题
+
+3、加进来的元素也要变成程响应式的
+
+技巧： 如果一个函数已经定义了，需要扩展其功能一般处理方法
+
+- 使用临时的函数名来存储函数
+- 重新定义原来的函数
+- 定义扩展的功能
+- 调用临时的那个函数
+
 
 # 发布订阅模式
