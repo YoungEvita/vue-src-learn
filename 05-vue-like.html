@@ -95,7 +95,9 @@
     function JGVue(options) {
         // 习惯，内部数据使用下划线开头，只读数据是有$开头
         this._options = options
-        this._data = options.data
+        // 在此处进行响应式化 reactify
+        this._data = options.data 
+        // reactify(this._data)
         this._template = document.querySelector(options.el) // vue中实际是字符串，我们这里是DOM
         this._parent = this._template.parentNode
         // 挂载
