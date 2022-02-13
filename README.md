@@ -132,3 +132,25 @@ Object.defineProperty(obj, prop, {
 已经将对象响应式化，如果直接给对象赋值另一个对象，此时不是响应式（vue依旧可以响应式）
 
 # 发布订阅模式
+- 代理方法 （app.name, app._data.name）
+- 事件模型 （node： event模块）
+- vue 中observe 与watcher 和Dep
+
+代理方法： 就是要讲app._data 中的成员映射到app 上
+
+由于需要在更新数据的时候，更新页面的内容，所以app._data 访问的成员与app 访问的成员应该是同一个
+
+由于app._data 已经是响应式的对象了，所以只需要让app访问的成员去访问app._data的对应成员就可以了
+
+例如：
+```
+app.name => app._data.name
+app.xx => app._data.xx
+```
+vue中引入函数proxy(target, src, prop), 这里是因为当时没有Proxy语法 
+
+# 发布订阅模式目的
+
+目标： 解耦，让各个模块之间没有紧密的联系
+
+问题： 现在demo 中mountComponent 更新的是什么？

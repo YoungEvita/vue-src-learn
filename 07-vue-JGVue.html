@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JGVue</title>
+</head>
+<body>
+    <div id="app">
+        <div>{{ name}}</div>
+        <div>{{ age }}</div>
+        <div>{{ gender }}</div>
+        <div>Hello 4</div>
+        <div>Hello 5</div>
+        <ul>
+            <li>li 1</li>
+            <li>li 2</li>
+            <li>li 3</li>
+        </ul>
+    </div>
+  
+</body>
+<script>
+
+    // 步骤拆解
+    // 1. 拿到模板
+    // 2. 拿到数据
+    // 3. 模板和数据结合得到HTML DOM元素
+    // 4. 放到页面中
+    let reg = /\{\{(.+?)\}\}/g // ? 取消贪婪模式
+
+
+     // 数组响应式
+     let ARRAY_METHOD = [
+        'push',
+        'pop',
+        'shift',
+        'unshift',
+        'reverse',
+        'sort',
+        'splice'
+    ]
+    let array_methods = Object.create(Array.prototype)
+    ARRAY_METHOD.forEach(method => {
+        array_methods[method] = function () {
+            console.log('调用拦截的方法')
+            // 将数据响应式化,把新增加的数据进行响应式化
+            for (let i =0 ;i < arguments.length; i++) {
+                reactify(arguments[i])
+            }
+            // 调用原来的方法
+            let res = Array.prototype[method].apply(this, arguments)
+            return res
+        }
+    })
+    // 虚拟DOM
+    class VNode {
+        constructor(tag, data, value, type) {
+            this.tag = tag && tag.toLowerCase()
+            this.data = data
+            this.value = value
+            this.type = type
+            this.children = []
+        }
+        appendChild(vnode) {
+            this.children.push(vnode)
+        }
+    }
+    // HTML DOM => vnode ,将这个函数作为compilier 函数
+    function generateVnode(node) {
+        let nodeType = node.nodeType
+        let _vnode = null
+        if (nodeType === 1) {
+            // 元素
+            let nodeName = node.nodeName
+            let attrs = node.attributes // 返回伪数组
+            let _attrObj = {}
+            for (let i = 0 ; i <attrs.length; i++) { // attrs[i] 属性节点（nodeType===2）
+                _attrObj[attrs[i].nodeName] = attrs[i].nodeValue
+            }
+            _vnode = new VNode(nodeName, _attrObj, undefined, nodeType)
+            
+            // 考虑node的子元素
+            let childNodes = node.childNodes
+            for (let i = 0 ; i < childNodes.length; i++) {
+                _vnode.appendChild(generateVnode(childNodes[i])) // 递归
+            }
+        } else if (nodeType === 3) {
+            _vnode = new VNode(undefined, undefined, node.nodeValue, nodeType)
+        }
+        return _vnode
+    }
+    // 虚拟dom => 真实DOM
+    function parseVNode(vnode) {
+        // 创建真实的DOM
+        let type = vnode.type
+        let _node = null
+        if (type === 3) { // 创建文本节点
+            return document.createTextNode(vnode.value)
+        } else if (type === 1){
+            // 标签
+            _node = document.createElement(vnode.tag)
+
+            // 属性
+            let data = vnode.data // 现在这个是data是键值对
+            Object.keys(data).forEach((key) => {
+                let attrName = key
+                let attrValue = data[key]
+                _node.setAttribute(attrName, attrValue)
+            })
+            // 子元素
+            let children = vnode.children
+            children.forEach((subvnode) => {
+                _node.appendChild(parseVNode(subvnode)) // 递归转换子元素（虚拟DOM）,递归会消耗内存
+            })
+            return _node
+        }
+    }
+
+    function JGVue(options) {
+        // 习惯，内部数据使用下划线开头，只读数据是有$开头
+        this._options = options
+        // 在此处进行响应式化 reactify
+        this._data = options.data 
+        reactify(this._data)
+        this._template = document.querySelector(options.el) // vue中实际是字符串，我们这里是DOM
+        this._parent = this._template.parentNode
+        // 挂载
+        this.mount()
+    } 
+
+    // 将带有坑的vnode+data => 带有数据的vnode； 模拟ast=> vnode
+    function combine(vnode, data) {
+        let _type = vnode.type
+        let _data = vnode.data
+        let _value = vnode.value
+        let _tag = vnode.tag
+        let _children = vnode.children
+
+        let _vnode = null
+
+        if (_type === 3) { // 文本节点
+            _value = _value.replace(reg, function(_, g1) {
+                return getValueByPath(data, g1.trim())
+            })
+            _vnode = new VNode(_tag, _data, _value, _type)
+        } else if (_type === 1) { // 元素节点
+            _vnode = new VNode(_tag, _data, _value, _type)
+            _children.forEach(_subvnode => {
+                _vnode.appendChild(combine(_subvnode, data))
+            })
+        }
+        return _vnode
+
+    }
+    
+    JGVue.prototype.mount = function () {
+        // 需要提供一个render方法， 生成虚拟DOM
+        // vue 中可以自定义render 函数
+        if (typeof this._options.render !== 'function') {
+            this.render = this.createRenderFn() // 缓存虚拟DOM
+        }
+       
+        this.mountComponent()
+    }
+
+    
+    JGVue.prototype.mountComponent = function () {
+        // 执行 mount() 函数
+        let mount = () => {
+            this.update(this.render())
+        }
+
+        mount.call(this) // 本质上应该交给watcher来调用，使用发布订阅模式，渲染和计算的行为应该交给watcher来完成
+    }
+
+    /**
+     *  在真正的vue 中使用了二次提交的设计结构
+     *  1、在页面中的DOM和虚拟DOM是一一对应的关系
+     *  2、缓存的是AST
+     *  3、先有AST和数据生成新的vnode
+     *  4、只要数据发生变化都会生成新的Vnode，新的vnode会和页面真正的vnode作比较（diif算法）
+     *  
+     * 
+    */ 
+    // 生成render函数，我们模拟来缓存虚拟DOM（vue实际缓存的AST）
+    JGVue.prototype.createRenderFn = function (realHTMLDOM) {
+        let ast = generateVnode(this._template)
+        // vue: ast + data => vnode
+        // 我们模拟： 带有”坑“的vnode + data =》 函数数据的vnode
+        return function render() {
+            // 将带坑的Vnode转换为真正的带数据的vnode
+            let _tmp = combine(ast, this._data)
+            return _tmp
+        }
+
+    }
+
+    // 将虚拟DOM元素放到页面中；（diff算法）
+    JGVue.prototype.update = function (vnode) {
+        //  简化直接HTML生成DOM replaceChild到页面中替换
+        // 父元素.replaceChilid(新元素， 旧元素)
+        let realDOM = parseVNode(vnode)
+        this._parent.replaceChild(realDOM, this._template)
+        console.log(realDOM)
+    }
+
+    // 如何用
+    let app = new JGVue({
+        el: '#app',
+        data: {
+            name: 'zhangsan',
+            age: '17',
+            gender: 'F',
+            course: [{name: 'football'}, {name: 'basketball'}]
+        }
+    })
+
+    // 使用 ‘xx.yy.zz' 格式来访问某一个对象的成员，即用字符串路径来访问对象的成员
+    function getValueByPath(obj, path) {
+        let paths = path.split('.')
+        let res = obj
+        let prop
+        while(prop = paths.shift()) {
+            res = res[prop]
+        }
+        return res
+    }
+
+    // 函数柯里化 ,缓存一些内容，减少解析
+    // 这个函数是在vue编译模板的时候生成的
+    function createGetValueByPath(path) {
+        let paths = path.split('.')
+        return function getValueByPath(obj) {
+            let res = obj
+            let prop
+            while(prop = paths.shift()) {
+                res = res[prop]
+            }
+            return res
+        }
+    }
+
+
+    // 将对象响应化
+    function reactify(obj, vm) {
+        let keys = Object.keys(obj)
+
+        for (let i = 0; i< keys.length; i++) {
+            let key = keys[i] // 属性名
+            let value = obj[key]
+            // 判断这个属性是不是引用类型， 是不是数组
+            // 如果是引用类型要递归
+            // 无论是否是引用类型与否，都需要将其响应式化
+            // 如果是数字，就需要循环数组，然后讲述组里的元素进行响应式化
+
+            if (Array.isArray(value)) {
+                value.__proto__ = array_methods // 此时data.course.push()会调用拦截的方法
+                // 数组
+                for (let j = 0; j < value.length; j++) {
+                    reactify(value[j], vm)
+                }
+            } else {
+                defineReactive(obj, key, value, true)
+            }
+            // 只需要在这里添加代理即可（问题：这里写的代码会是递归的）
+            // 如果在这里将属性映射到Vue实例中，那么就表示Vue实例可以使用属性key
+            // {data: {name: 'jack'}, child: {name:'cc'}} 这样会带来的问题是是后面name把前面的name 覆盖
+        }
+    }
+
+    function defineReactive(target, key, value, enumerable) {
+        // 函数内部就是一个局部作用域，这个value 就只在函数内部使用的变量
+
+        if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+           // 非数组的引用类型
+           reactify(value) 
+        }
+        Object.defineProperty(target, key, {
+            configurable: true,
+            enumerable: !!enumerable,
+            get () {
+                console.log(`读取o的${key}属性`)
+                return value
+            },
+            set (newVal) {
+                console.log(`设置o的${key}属性`)
+                // value = newVal
+                // 数据发生变化页面发生变化，只需要在这里模板刷新
+                // 获取vue的实例 watcher 不会存在这个问题
+                // 在调用reactify(data, this) ,传一个this
+                value = reactify(newVal) // 数组本身不是响应式的的，无法进行直接赋值响应式化 ，其他已经处于响应式化的可以赋值
+                this.mountComponent()
+            }
+        })
+    }
+
+   
+
+</script>
+</html>
