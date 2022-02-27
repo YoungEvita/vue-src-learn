@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>事件模型</title>
+</head>
+<body>
+    
+</body>
+<script>
+    // 全局的event 对象，提供 on， off， emit 方法
+    var event = (function () {
+        // 闭包作用： 存储事件的具体内容
+        eventObjs = {
+        }; 
+        return {
+            // 注册事件， 可以连续注册事件，可以注册多个事件
+            on: function (type, handler) {
+                (eventObjs[type] || (eventObjs[type] = [])).push(handler)
+            },
+            // 移除事件，如果没有参数，移除所有事件，
+            // 如果只有事件名, 就移除这个事件名下的所有事件
+            // 如果带有两个参数(事件名，处理函数)，就移除某一个事件的具体处理函数
+            off: function (type, handler) {
+                if (arguments.length === 0) { // 没有参数，移除所有事件
+                    eventObjs = {}
+                } else if (arguments.length === 1) {  // 移除每一类型的事件
+                    eventObjs[type] = []
+                } else if (arguments.length === 2) { //移除type事件的handler函数
+                    let _events = eventObjs[type]
+                    if (!_events) return
+                    // 倒着 循环数组的序号不会受到影响，因为splice会影响数组的长度
+                    for (let i = _events.length-1; i>=0; i--) {
+                        if (_events[i] === handler) {
+                            _events.splice(i, 1);
+                        }
+                    }
+                }
+            },
+            // 发射事件，触发事件， 包装参数，传递给事件处理函数
+            emit: function (type) {
+                // arguments 伪数组，没有slice
+                let args = Array.prototype.slice.call(arguments, 1) // 获得arguments 从1开始后的所有元素，返回的是数组
+                let _events = eventObjs[type]
+                if (!_events) return
+                
+                for (let i = 0; i < _events.length; i++) {
+                    // 如果要绑定上下文就需要使用call 或者apply
+                    _events[i].apply(null, args)
+                }
+            }    
+        }
+    }());
+
+
+    // 注册事件
+    event.on('click', () => console.log('第1个click事件'))
+    event.on('click', () => console.log('第2个click事件'))
+    event.on('click', () => console.log('第3个click事件'))
+    event.on('click', () => console.log('第4个click事件'))
+    event.on('click', () => console.log('第5个click事件'))
+    
+    function f () {
+        // 发射事件
+        event.emit('click')
+    }
+    
+</script>
+</html>
