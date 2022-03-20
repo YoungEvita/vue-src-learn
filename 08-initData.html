@@ -299,6 +299,7 @@
 
     // 将对象响应化
     function reactify(obj, vm) {
+        // 没有对obj本身进行响应式处理，是对o的成员进行响应式处理
         let keys = Object.keys(obj)
 
         for (let i = 0; i< keys.length; i++) {

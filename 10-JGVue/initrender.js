@@ -46,6 +46,7 @@ JGVue.prototype.update = function (vnode) {
     //  简化直接HTML生成DOM replaceChild到页面中替换
     // 父元素.replaceChilid(新元素， 旧元素)
     let realDOM = parseVNode(vnode)
-    this._parent.replaceChild(realDOM, this._template)
+    console.log(this._template) // 这里输出的是最开始带坑的html
+    this._parent.replaceChild(realDOM, document.querySelector("#app")) // 这里不能用templage，在app.name=‘cc' 时会报错
     console.log(realDOM)
 }

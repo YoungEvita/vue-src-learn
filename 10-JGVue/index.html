@@ -8,23 +8,23 @@
     <script src="compiler.js"></script>
     <script src="jgvue.js"></script>
     <script src="initrender.js"></script>
+    <script src="initdata.js"></script>
 </head>
 <body>
     <div id="app">
-        <div>Hello 1</div>
-        <div>Hello 2</div>
-        <div>Hello 3</div>
-        <div>Hello 4</div>
-        <div>Hello 5</div>
+        <div>{{ name}}</div>
+        <div>{{ age }}</div>
+        <div>{{ gender }}</div>
         <ul>
             <li>li 1</li>
             <li>li 2</li>
             <li>li 3</li>
         </ul>
     </div>
+</body>
     <script>
         let app = new JGVue({
-            el: '#root',
+            el: '#app',
             data: {
                 name: 'zhangsan',
                 age: 17,
@@ -37,5 +37,4 @@
             }
         })
     </script>
-</body>
 </html>
