@@ -46,10 +46,9 @@ function defineReactive(target, key, value, enumerable) {
             //  目的
             // 将重新赋值的数据编程响应式的，因此如果传入的是对象类型，那么就需要使用observe 将其转换为响应式
             // 临时判断
-            if (typeof newVal === 'Object' && newVal !== null) {
+            if (typeof newVal === 'object' && newVal !== null) {
                 observe(newVal)
             } 
-
             value = newVal
              // 数组本身不是响应式的的，无法进行直接赋值响应式化 ，其他已经处于响应式化的可以赋值
             typeof that.mountComponent === 'function' && that.mountComponent()
