@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="watcher.js"></script>
+    <script src="Dep.js"></script>
     <script src="vnode.js"></script>
     <script src="compiler.js"></script>
     <script src="jgvue.js"></script>
@@ -33,8 +35,21 @@
                     name: 'andy', age: 9, gender: 'F'
                 }, {
                     name: 'lucy', age: 10, gender: 'M'
-                }]
+                }],
+                a: {
+                    b: {
+                        c: 'demo'
+                    }
+                }
+            },
+            computed: {
+                // 计算属性也是响应式的（watcher）
+            },
+            watch: {
+                // 监听什么属性，这个属性是支持路径语语法的
+                // 也是使用watcher来实现的
             }
+
         })
     </script>
 </html>

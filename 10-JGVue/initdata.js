@@ -30,15 +30,22 @@ function defineReactive(target, key, value, enumerable) {
        // 非数组的引用类型
        observe(value) 
     }
+
+    let dep = new Dep()
+
     Object.defineProperty(target, key, {
         configurable: true,
         enumerable: !!enumerable,
         get () {
             console.log(`读取o的${key}属性`)
+
+            // 依赖收集（暂时略）
+            dep.depend()
             return value
         },
         set (newVal) {
             console.log(`设置o的${key}属性`)
+            if (value === newVal) return
             // value = newVal
             // 数据发生变化页面发生变化，只需要在这里模板刷新
             // 获取vue的实例 watcher 不会存在这个问题
@@ -50,31 +57,29 @@ function defineReactive(target, key, value, enumerable) {
                 observe(newVal)
             } 
             value = newVal
-             // 数组本身不是响应式的的，无法进行直接赋值响应式化 ，其他已经处于响应式化的可以赋值
-            typeof that.mountComponent === 'function' && that.mountComponent()
+            
+            // 派发更新， 找到全局的watcher ，调用update
+            dep.notify()
 
-            // 临时， 数组现在没有参与页面的渲染
-            // 所以在新的数组上进行响应式式的处理，不需要页面的刷新
-            // 即使这里也无法调用也没有关系
         }
     })
 }
 
 // 将对象obj自身响应化, vm 就是vue实例，为了调用时处理上下文
-function observe(obj, vm) {
+function observe(obj) {
     //之前没有对obj本身操作，此时直接对obj进行判断
     if (Array.isArray(obj)) {
         // 对其每一个元素处理
         obj.__proto__ =  array_methods
         for (let i =0 ;i <obj.length; i++) {
-            observe(obj[i], vm)
+            observe(obj[i])
         }
     } else {
         // 对其成员进行处理
         let keys = Object.keys(obj)
         for (let i = 0; i< keys.length; i++) {
             let prop = keys[i]
-            defineReactive.call(vm, obj, prop, obj[prop], true)
+            defineReactive(obj, prop, obj[prop], true)
         }
     }
 }
@@ -96,7 +101,7 @@ JGVue.prototype.initData = function() {
     // 遍历this._data的成员，将属性转化为响应式，将直接属性代理到实例上
     let keys = Object.keys(this._data)
      
-    observe(this._data, this)
+    observe(this._data)
 
     // 代理
     for(let i=0; i<keys.length; i++) {

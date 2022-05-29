@@ -16,7 +16,8 @@ JGVue.prototype.mountComponent = function () {
         this.update(this.render())
     }
 
-    mount.call(this) // 本质上应该交给watcher来调用，使用发布订阅模式，渲染和计算的行为应该交给watcher来完成
+    // 这个watcher 是全局的，在任何一个位置都可以访问
+    Dep.target = new Watcher(this, mount) // 相当于调用了mount
 }
 
 /**
