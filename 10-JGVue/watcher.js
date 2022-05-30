@@ -29,7 +29,7 @@ class Watcher {
         this.get() // 在vue 中调用queueWatcher 来处罚nextTick 进行异步的执行
     }
     // 对外公开的函数，用于在属性发生变化的时触发的接口
-    upadte() {
+    update() {
         this.run()
     }
     // 清空队列
