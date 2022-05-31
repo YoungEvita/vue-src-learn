@@ -262,4 +262,10 @@ watcher实例属性vm，表示当前的vue 实例
 依赖收集就是告诉当前的watcher 什么属性被访问了，那么在这个watcher计算或渲染页面的时候就会将这些收集到的属性进行更新 （局部更新）
 
 如何将属性与当前watcher关联起来
+    - 在全局准备一个targetStatck（watcher栈）
+    - 在Watcher调用get方法的时候，将当前watcher放到全局，在get执行结束的时候，将全局watcher移除。提供 pushTarget， popTarget
+    - 在每一个属性中都有一个Dep对象
+    - 在访问对象属性的时候（get）， 渲染watcher 就在全局中
+    - 将属性与watcher相关联，把渲染watcher存储到属性相关的dep中，同时将dep存储到全局watcher中（互相引用的关系）
+   -- 渲染watcher - 》 dep  -》全局watcher
 # Observer对象
