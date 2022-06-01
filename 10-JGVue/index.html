@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
     <script src="initrender.js"></script>
     <script src="initdata.js"></script>
 </head>
+
 <body>
     <div id="app">
         <div>{{ name}}</div>
@@ -24,32 +26,38 @@
         </ul>
     </div>
 </body>
-    <script>
-        let app = new JGVue({
-            el: '#app',
-            data: {
-                name: 'zhangsan',
-                age: 17,
-                gender: 'F',
-                children: [{
-                    name: 'andy', age: 9, gender: 'F'
-                }, {
-                    name: 'lucy', age: 10, gender: 'M'
-                }],
-                a: {
-                    b: {
-                        c: 'demo'
-                    }
+<script>
+    let app = new JGVue({
+        el: '#app',
+        data: {
+            name: 'zhangsan',
+            age: 17,
+            gender: 'F',
+            children: [{
+                name: 'andy',
+                age: 9,
+                gender: 'F'
+            }, {
+                name: 'lucy',
+                age: 10,
+                gender: 'M'
+            }],
+            fatcher: '父亲',
+            a: {
+                b: {
+                    c: 'demo'
                 }
-            },
-            computed: {
-                // 计算属性也是响应式的（watcher）
-            },
-            watch: {
-                // 监听什么属性，这个属性是支持路径语语法的
-                // 也是使用watcher来实现的
             }
+        },
+        computed: {
+            // 计算属性也是响应式的（watcher）
+        },
+        watch: {
+            // 监听什么属性，这个属性是支持路径语语法的
+            // 也是使用watcher来实现的
+        }
 
-        })
-    </script>
+    })
+</script>
+
 </html>

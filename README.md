@@ -268,4 +268,9 @@ watcher实例属性vm，表示当前的vue 实例
     - 在访问对象属性的时候（get）， 渲染watcher 就在全局中
     - 将属性与watcher相关联，把渲染watcher存储到属性相关的dep中，同时将dep存储到全局watcher中（互相引用的关系）
    -- 渲染watcher - 》 dep  -》全局watcher
+
+
+# Watcher 与Dep 与属性的关系
+
+假设页面有三个属性 name ， age， gender
 # Observer对象

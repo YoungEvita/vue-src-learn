@@ -37,9 +37,6 @@ class Dep {
         deps.forEach((watcher) => {
             watcher.update();
         });
-        // if (Dep.target) {
-        //     Dep.target.update()
-        // }
     }
 }
 

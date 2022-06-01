@@ -13,6 +13,7 @@ JGVue.prototype.mountComponent = function() {
     // 执行 mount() 函数
     let mount = () => {
         this.update(this.render())
+        console.log('渲染了。。')
     }
 
     // 这个watcher 是全局的，在任何一个位置都可以访问
