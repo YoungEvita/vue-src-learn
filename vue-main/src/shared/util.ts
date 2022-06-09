@@ -106,6 +106,8 @@ export function toNumber(val: string): number | string {
 /**
  * Make a map and return a function for checking if a key
  * is in that map.
+ * 生成一个带有缓存的函数，用于判断数据是否是缓存中的数据
+ * 代表盘阶段字符串（标签名）是否为HTML 内置标签
  */
 export function makeMap(
   str: string,
@@ -151,6 +153,7 @@ export function hasOwn(obj: Object | Array<any>, key: string): boolean {
 
 /**
  * Create a cached version of a pure function.
+ * 生成带有缓存的函数（闭包的应用）
  */
 export function cached<R>(fn: (str: string) => R): (sr: string) => R {
   const cache: Record<string, R> = Object.create(null)
@@ -163,7 +166,7 @@ export function cached<R>(fn: (str: string) => R): (sr: string) => R {
 /**
  * Camelize a hyphen-delimited string.
  */
-const camelizeRE = /-(\w)/g
+const camelizeRE = /-(\w)/g   // \w 等同于[A-Za-z0-9_]
 export const camelize = cached((str: string): string => {
   return str.replace(camelizeRE, (_, c) => (c ? c.toUpperCase() : ''))
 })
@@ -361,6 +364,6 @@ export function hasChanged(x: unknown, y: unknown): boolean {
   if (x === y) {
     return x === 0 && 1 / x !== 1 / (y as number)
   } else {
-    return x === x && y === y
+    return x === x && y === y  // NaN 不等于任何值
   }
 }
