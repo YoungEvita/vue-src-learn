@@ -11,15 +11,15 @@ import type { Component } from 'types/component'
 import type { InternalComponentOptions } from 'types/options'
 import { EffectScope } from 'v3/reactivity/effectScope'
 
-let uid = 0
+let uid = 0  // 每一个个类型的实例都有唯一标识
 
 export function initMixin(Vue: typeof Component) {
   Vue.prototype._init = function (options?: Record<string, any>) {
-    const vm: Component = this
+    const vm: Component = this  // vue 实例
     // a uid
     vm._uid = uid++
 
-    let startTag, endTag
+    let startTag, endTag  // 测试性能用的
     /* istanbul ignore if */
     if (__DEV__ && config.performance && mark) {
       startTag = `vue-perf-start:${vm._uid}`
@@ -55,12 +55,12 @@ export function initMixin(Vue: typeof Component) {
     }
     // expose real self
     vm._self = vm
-    initLifecycle(vm)
-    initEvents(vm)
-    initRender(vm)
-    callHook(vm, 'beforeCreate')
+    initLifecycle(vm)  // 初始化生命周期
+    initEvents(vm)  // 初始化事件的容器
+    initRender(vm)  // 初始化渲染标记用到的变量
+    callHook(vm, 'beforeCreate')  // 调用生命周期函数
     initInjections(vm) // resolve injections before data/props
-    initState(vm)
+    initState(vm)  // 初始化状态（data，props）
     initProvide(vm) // resolve provide after data/props
     callHook(vm, 'created')
 
@@ -72,7 +72,8 @@ export function initMixin(Vue: typeof Component) {
     }
 
     if (vm.$options.el) {
-      vm.$mount(vm.$options.el)
+      vm.$mount(vm.$options.el)  // 组件挂载，将组件挂载到el元素上
+      // 会先调用扩展的$mount方法，在调用原始的$mount方法
     }
   }
 }

@@ -107,13 +107,13 @@ function initProps(vm: Component, propsOptions: Object) {
         }
       })
     } else {
-      defineReactive(props, key, value)
+      defineReactive(props, key, value)  // 响应式处理
     }
     // static props are already proxied on the component's prototype
     // during Vue.extend(). We only need to proxy props defined at
     // instantiation here.
     if (!(key in vm)) {
-      proxy(vm, `_props`, key)
+      proxy(vm, `_props`, key) // 将_props上的成员映射到vue实例上，不需要用app._props.xxx 访问，用app.xxx 就可以访问
     }
   }
   toggleObserving(true)
@@ -151,16 +151,17 @@ function initData(vm: Component) {
           vm
         )
     } else if (!isReserved(key)) {
-      proxy(vm, `_data`, key)
+      proxy(vm, `_data`, key)   // 遍历data属性，映射到vue实例上，直接app.xxx 来代替app.data.xxx 来访问属性
     }
   }
   // observe data
-  const ob = observe(data)
+  const ob = observe(data) // 响应式数据
   ob && ob.vmCount++
 }
 
 export function getData(data: Function, vm: Component): any {
   // #7573 disable dep collection when invoking data getters
+  // 此时vue初始化，没有进行模板渲染，不需要进行依赖收集，如果全局Watcher(Dep.target )为空，不会进行依赖收集
   pushTarget()
   try {
     return data.call(vm, vm)
@@ -300,6 +301,7 @@ function initMethods(vm: Component, methods: Object) {
       }
     }
     vm[key] = typeof methods[key] !== 'function' ? noop : bind(methods[key], vm)
+    // 将methods中属性中的方法，绑定上下文，挂载到vue实例上
   }
 }
 

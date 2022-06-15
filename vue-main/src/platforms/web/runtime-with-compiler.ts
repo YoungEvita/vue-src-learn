@@ -2,9 +2,9 @@ import config from 'core/config'
 import { warn, cached } from 'core/util/index'
 import { mark, measure } from 'core/util/perf'
 
-import Vue from './runtime/index'
-import { query } from './util/index'
-import { compileToFunctions } from './compiler/index'
+import Vue from './runtime/index'  // vue
+import { query } from './util/index'  //queryselector
+import { compileToFunctions } from './compiler/index' // 生成render函数
 import {
   shouldDecodeNewlines,
   shouldDecodeNewlinesForHref

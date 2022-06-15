@@ -290,3 +290,6 @@ watcher实例属性vm，表示当前的vue 实例
 4. server 服务端，主要是将vue 用在服务端的代理代码
 5. sfc ，单文件组件
 6. shared， 公共工具
+
+# 初始化流程
+initState： props， methods， data，computed， watcher

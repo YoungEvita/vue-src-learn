@@ -154,6 +154,8 @@ export function hasOwn(obj: Object | Array<any>, key: string): boolean {
 /**
  * Create a cached version of a pure function.
  * 生成带有缓存的函数（闭包的应用）
+ *  每次数据更新 -> 虚拟DOM的生成（模板解析的行为）-> 将常用字符串和算法进行缓存
+ *  垃圾回收原则中，使用的越多的数据，一半都会频繁的使用
  */
 export function cached<R>(fn: (str: string) => R): (sr: string) => R {
   const cache: Record<string, R> = Object.create(null)
@@ -165,6 +167,7 @@ export function cached<R>(fn: (str: string) => R): (sr: string) => R {
 
 /**
  * Camelize a hyphen-delimited string.
+ *  转换成驼峰命名规则
  */
 const camelizeRE = /-(\w)/g   // \w 等同于[A-Za-z0-9_]
 export const camelize = cached((str: string): string => {
@@ -180,6 +183,8 @@ export const capitalize = cached((str: string): string => {
 
 /**
  * Hyphenate a camelCase string.
+ *  驼峰转换成连接符形式
+ *  /B匹配非单词边界，即单词与单词，符号与符号
  */
 const hyphenateRE = /\B([A-Z])/g
 export const hyphenate = cached((str: string): string => {
@@ -192,6 +197,7 @@ export const hyphenate = cached((str: string): string => {
  * since native bind is now performant enough in most browsers.
  * But removing it would mean breaking code that was able to run in
  * PhantomJS 1.x, so this must be kept for backward compatibility.
+ * 兼容bind方法
  */
 
 /* istanbul ignore next */
@@ -292,6 +298,8 @@ export function genStaticKeys(
 /**
  * Check if two values are loosely equal - that is,
  * if they are plain objects, do they have the same shape?
+ *  思想重要，比较两个对象是否相等
+ *  对象- 》数组 ，Date， else 字符串比较
  */
 export function looseEqual(a: any, b: any): boolean {
   if (a === b) return true
@@ -348,6 +356,7 @@ export function looseIndexOf(arr: Array<unknown>, val: unknown): number {
 
 /**
  * Ensure a function is called only once.
+ * 函数只运行一次
  */
 export function once<T extends (...args: any[]) => any>(fn: T): T {
   let called = false
