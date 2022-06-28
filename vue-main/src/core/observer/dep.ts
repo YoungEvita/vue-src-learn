@@ -48,6 +48,7 @@ export default class Dep {
     }
   }
 
+  // 每一个属性都会有dep实例，dep会记录参与计算或渲染的watcher
   notify(info?: DebuggerEventExtraInfo) {
     // stabilize the subscriber list first
     const subs = this.subs.slice()

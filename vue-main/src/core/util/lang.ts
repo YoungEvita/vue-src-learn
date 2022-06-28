@@ -16,11 +16,12 @@ export function isReserved(str: string): boolean {
 
 /**
  * Define a property.
+ *  在vue中实例存在大量的循环引用，在递归遍历对象成员的时候，避免死递归
  */
 export function def(obj: Object, key: string, val: any, enumerable?: boolean) {
   Object.defineProperty(obj, key, {
     value: val,
-    enumerable: !!enumerable,
+    enumerable: !!enumerable,         // Object.keys () ，不可枚举的获取不到
     writable: true,
     configurable: true
   })

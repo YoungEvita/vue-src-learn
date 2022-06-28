@@ -7,7 +7,9 @@ import { TriggerOpTypes } from '../../v3'
 import { def } from '../util/index'
 
 const arrayProto = Array.prototype
+ // arrayMethods继承自Array.prototype 的数组， 只需要让响应式数组继承自arrayMethods
 export const arrayMethods = Object.create(arrayProto)
+
 
 const methodsToPatch = [
   'push',

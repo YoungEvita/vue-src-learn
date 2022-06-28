@@ -17,7 +17,7 @@ import {
 } from '../util/index'
 import { isReadonly, isRef, TrackOpTypes, TriggerOpTypes } from '../../v3'
 
-const arrayKeys = Object.getOwnPropertyNames(arrayMethods)
+const arrayKeys = Object.getOwnPropertyNames(arrayMethods)  // getOwnPropertyNames不可枚举的属性也会获取
 
 const NO_INIITIAL_VALUE = {}
 
@@ -45,18 +45,21 @@ export class Observer {
     // this.value = value
     this.dep = new Dep()
     this.vmCount = 0
-    def(value, '__ob__', this)
+    def(value, '__ob__', this)  // 逻辑上等价于value.__ob__ = this
+
+    // 响应式化逻辑
     if (isArray(value)) {
+      // 判断浏览器是否兼容)__proto__
       if (hasProto) {
-        protoAugment(value, arrayMethods)
+        protoAugment(value, arrayMethods) // 完成数组的原型链修改，从而使数组变成响应式的
       } else {
         copyAugment(value, arrayMethods, arrayKeys)
       }
       if (!shallow) {
-        this.observeArray(value)
+        this.observeArray(value)  // 遍历数组的元素，进行递归observe
       }
     } else {
-      this.walk(value, shallow)
+      this.walk(value, shallow)   // 遍历对象的属性，递归observe
     }
   }
 

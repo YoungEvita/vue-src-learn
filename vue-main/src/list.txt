@@ -1,0 +1,203 @@
+
+|------  global.d.ts
+|------
+|------|------compiler
+|------  |------  codeframe.ts
+|------  |------  create-compiler.ts
+|------  |------  error-detector.ts
+|------  |------  helpers.ts
+|------  |------  index.ts
+|------  |------  optimizer.ts
+|------  |------  to-function.ts
+|------  |------
+|------  |------|------codegen
+|------  |------      events.ts
+|------  |------      index.ts
+|------  |------
+|------  |------|------directives
+|------  |------      bind.ts
+|------  |------      index.ts
+|------  |------      model.ts
+|------  |------      on.ts
+|------  |------
+|------  |------|------parser
+|------          entity-decoder.ts
+|------          filter-parser.ts
+|------          html-parser.ts
+|------          index.ts
+|------          text-parser.ts
+|------
+|------|------core
+|------  |------  config.ts
+|------  |------  index.ts
+|------  |------
+|------  |------|------components
+|------  |------      index.ts
+|------  |------      keep-alive.ts
+|------  |------
+|------  |------|------global-api
+|------  |------      assets.ts
+|------  |------      extend.ts
+|------  |------      index.ts
+|------  |------      mixin.ts
+|------  |------      use.ts
+|------  |------
+|------  |------|------instance
+|------  |------  |------  events.ts
+|------  |------  |------  index.ts
+|------  |------  |------  init.ts
+|------  |------  |------  inject.ts
+|------  |------  |------  lifecycle.ts
+|------  |------  |------  proxy.ts
+|------  |------  |------  render.ts
+|------  |------  |------  state.ts
+|------  |------  |------
+|------  |------  |------|------render-helpers
+|------  |------          bind-dynamic-keys.ts
+|------  |------          bind-object-listeners.ts
+|------  |------          bind-object-props.ts
+|------  |------          check-keycodes.ts
+|------  |------          index.ts
+|------  |------          render-list.ts
+|------  |------          render-slot.ts
+|------  |------          render-static.ts
+|------  |------          resolve-filter.ts
+|------  |------          resolve-scoped-slots.ts
+|------  |------          resolve-slots.ts
+|------  |------
+|------  |------|------observer
+|------  |------      array.ts                       //  创建含有重写数组方法，让所有响应式数据数组继承该数组
+|------  |------      dep.ts                         //  Dep 类
+|------  |------      index.ts                       //  Observer 类，工厂函数
+|------  |------      scheduler.ts                 //  vue 的任务调度工具，watcher执行中心
+|------  |------      traverse.ts                   //  递归遍历响应式数据，目的是触发依赖收集
+|------  |------      watcher.ts                    // Watcher 类
+|------  |------
+|------  |------|------util
+|------  |------      debug.ts
+|------  |------      env.ts
+|------  |------      error.ts
+|------  |------      index.ts
+|------  |------      lang.ts
+|------  |------      next-tick.ts
+|------  |------      options.ts
+|------  |------      perf.ts
+|------  |------      props.ts
+|------  |------
+|------  |------|------vdom
+|------      |------  create-component.ts
+|------      |------  create-element.ts
+|------      |------  create-functional-component.ts
+|------      |------  patch.ts
+|------      |------  vnode.ts
+|------      |------
+|------      |------|------helpers
+|------      |------      extract-props.ts
+|------      |------      get-first-component-child.ts
+|------      |------      index.ts
+|------      |------      is-async-placeholder.ts
+|------      |------      merge-hook.ts
+|------      |------      normalize-children.ts
+|------      |------      normalize-scoped-slots.ts
+|------      |------      resolve-async-component.ts
+|------      |------      update-listeners.ts
+|------      |------
+|------      |------|------modules
+|------              directives.ts
+|------              index.ts
+|------              template-ref.ts
+|------
+|------|------platforms
+|------  |------|------web
+|------      |------  entry-compiler-sfc.ts
+|------      |------  entry-compiler.ts
+|------      |------  entry-runtime-esm.ts
+|------      |------  entry-runtime-with-compiler-esm.ts
+|------      |------  entry-runtime-with-compiler.ts
+|------      |------  entry-runtime.ts
+|------      |------  runtime-with-compiler.ts
+|------      |------
+|------      |------|------compiler
+|------      |------  |------  index.ts
+|------      |------  |------  options.ts
+|------      |------  |------  util.ts
+|------      |------  |------
+|------      |------  |------|------directives
+|------      |------  |------      html.ts
+|------      |------  |------      index.ts
+|------      |------  |------      model.ts
+|------      |------  |------      text.ts
+|------      |------  |------
+|------      |------  |------|------modules
+|------      |------          class.ts
+|------      |------          index.ts
+|------      |------          model.ts
+|------      |------          style.ts
+|------      |------
+|------      |------|------runtime
+|------      |------  |------  class-util.ts
+|------      |------  |------  index.ts
+|------      |------  |------  node-ops.ts
+|------      |------  |------  patch.ts
+|------      |------  |------  transition-util.ts
+|------      |------  |------
+|------      |------  |------|------components
+|------      |------  |------      index.ts
+|------      |------  |------      transition-group.ts
+|------      |------  |------      transition.ts
+|------      |------  |------
+|------      |------  |------|------directives
+|------      |------  |------      index.ts
+|------      |------  |------      model.ts
+|------      |------  |------      show.ts
+|------      |------  |------
+|------      |------  |------|------modules
+|------      |------          attrs.ts
+|------      |------          class.ts
+|------      |------          dom-props.ts
+|------      |------          events.ts
+|------      |------          index.ts
+|------      |------          style.ts
+|------      |------          transition.ts
+|------      |------
+|------      |------|------util
+|------              attrs.ts
+|------              class.ts
+|------              compat.ts
+|------              element.ts
+|------              index.ts
+|------              style.ts
+|------
+|------|------shared
+|------      constants.ts
+|------      util.ts
+|------
+|------|------types
+|------      compiler.ts
+|------      component.ts
+|------      global-api.ts
+|------      modules.d.ts
+|------      options.ts
+|------      ssr.ts
+|------      utils.ts
+|------      vnode.ts
+|------
+|------|------v3
+    |------  apiInject.ts
+    |------  apiLifecycle.ts
+    |------  apiSetup.ts
+    |------  apiWatch.ts
+    |------  currentInstance.ts
+    |------  debug.ts
+    |------  h.ts
+    |------  index.ts
+    |------
+    |------|------reactivity
+            computed.ts
+            effect.ts
+            effectScope.ts
+            operations.ts
+            reactive.ts
+            readonly.ts
+            ref.ts
+
