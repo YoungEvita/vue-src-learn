@@ -94,7 +94,7 @@ export class Observer {
  */
 function protoAugment(target, src: Object) {
   /* eslint-disable no-proto */
-  target.__proto__ = src
+  target.__proto__ = src  // 完成数组的原型链修改，从而使的数组编程响应式（pop，push， shift， unshift）
   /* eslint-enable no-proto */
 }
 
@@ -103,6 +103,7 @@ function protoAugment(target, src: Object) {
  * hidden properties.
  */
 /* istanbul ignore next */
+// 如果浏览器不支持，就将这些方法直接混入到当前数组中，属性访问元素
 function copyAugment(target: Object, src: Object, keys: Array<string>) {
   for (let i = 0, l = keys.length; i < l; i++) {
     const key = keys[i]
@@ -120,13 +121,13 @@ export function observe(value: any, shallow?: boolean): Observer | void {
     return
   }
   let ob: Observer | void
-  if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
+  if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) { // 如果有此__ob__(vueV响应式的标记)，且是Observer实例
     ob = value.__ob__
   } else if (
     shouldObserve &&
     !isServerRendering() &&
     (isArray(value) || isPlainObject(value)) &&
-    Object.isExtensible(value) &&
+    Object.isExtensible(value) &&  // isExtensible 可扩展，相反preventExtensions， seal ，freeze
     !value.__v_skip
   ) {
     ob = new Observer(value, shallow)

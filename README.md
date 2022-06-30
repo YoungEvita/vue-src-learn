@@ -294,6 +294,6 @@ watcher实例属性vm，表示当前的vue 实例
 # 初始化流程
 initState： props， methods， data，computed， watcher
 
-observer
-watch computed
-patch
+- observer
+- watch 和 computed
+- patch

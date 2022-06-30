@@ -121,6 +121,7 @@ function initProps(vm: Component, propsOptions: Object) {
 
 function initData(vm: Component) {
   let data: any = vm.$options.data
+   // 将data 挂载到实例的 _data 上
   data = vm._data = isFunction(data) ? getData(data, vm) : data || {}
   if (!isPlainObject(data)) {
     data = {}
@@ -136,6 +137,7 @@ function initData(vm: Component) {
   const props = vm.$options.props
   const methods = vm.$options.methods
   let i = keys.length
+  // 变量同名冲突 props， data ，method
   while (i--) {
     const key = keys[i]
     if (__DEV__) {

@@ -16,6 +16,7 @@ export function isReserved(str: string): boolean {
 
 /**
  * Define a property.
+ *  使用参数，将可枚举编程可控的
  *  在vue中实例存在大量的循环引用，在递归遍历对象成员的时候，避免死递归
  */
 export function def(obj: Object, key: string, val: any, enumerable?: boolean) {
