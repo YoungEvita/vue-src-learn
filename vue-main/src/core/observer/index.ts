@@ -147,7 +147,7 @@ export function defineReactive(
 ) {
   const dep = new Dep()
 
-  const property = Object.getOwnPropertyDescriptor(obj, key)
+  const property = Object.getOwnPropertyDescriptor(obj, key) // 获取对象的属性描述
   if (property && property.configurable === false) {
     return
   }
