@@ -146,8 +146,9 @@ export function defineReactive(
   shallow?: boolean
 ) {
   const dep = new Dep()
-
-  const property = Object.getOwnPropertyDescriptor(obj, key) // 获取对象的属性描述
+ // 获取对象的属性描述,， 就是定义Object.defineProperty 对象传入的 {configurable, enumerable 等}
+ //
+  const property = Object.getOwnPropertyDescriptor(obj, key) // 获取对象的属性描述,
   if (property && property.configurable === false) {
     return
   }
@@ -167,7 +168,7 @@ export function defineReactive(
     enumerable: true,
     configurable: true,
     get: function reactiveGetter() {
-      const value = getter ? getter.call(obj) : val
+      const value = getter ? getter.call(obj) : val  // 保证了已经定义的get方法可以被继承下来，不会丢失
       if (Dep.target) {
         if (__DEV__) {
           dep.depend({
@@ -176,8 +177,9 @@ export function defineReactive(
             key
           })
         } else {
-          dep.depend()
+          dep.depend()  // 关联当前属性
         }
+        // 收集子属性
         if (childOb) {
           childOb.dep.depend()
           if (isArray(value)) {
@@ -189,12 +191,13 @@ export function defineReactive(
     },
     set: function reactiveSetter(newVal) {
       const value = getter ? getter.call(obj) : val
-      if (!hasChanged(value, newVal)) {
+      if (!hasChanged(value, newVal)) { // 值没有变化，不会进行派发更新
         return
       }
       if (__DEV__ && customSetter) {
         customSetter()
       }
+      // 保证已经定义的set 方法，可以被继承下来，不会丢失
       if (setter) {
         setter.call(obj, newVal)
       } else if (getter) {
@@ -206,7 +209,7 @@ export function defineReactive(
       } else {
         val = newVal
       }
-      childOb = !shallow && observe(newVal)
+      childOb = !shallow && observe(newVal) // 对新值进行响应式化
       if (__DEV__) {
         dep.notify({
           type: TriggerOpTypes.SET,

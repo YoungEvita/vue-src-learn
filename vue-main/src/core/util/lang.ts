@@ -32,7 +32,7 @@ export function def(obj: Object, key: string, val: any, enumerable?: boolean) {
  * Parse simple path.
  */
 const bailRE = new RegExp(`[^${unicodeRegExp.source}.$_\\d]`)
-export function parsePath(path: string): any {
+export function parsePath(path: string): any {  // 用来解析xx.xx
   if (bailRE.test(path)) {
     return
   }

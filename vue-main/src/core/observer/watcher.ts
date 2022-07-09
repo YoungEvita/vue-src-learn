@@ -19,7 +19,7 @@ import type { SimpleSet } from '../util/index'
 import type { Component } from 'types/component'
 import { activeEffectScope, recordEffectScope } from 'v3/reactivity/effectScope'
 
-let uid = 0
+let uid = 0 // watcher唯一标识
 
 /**
  * @internal
@@ -40,24 +40,29 @@ export interface WatcherOptions extends DebuggerOptions {
  */
 export default class Watcher implements DepTarget {
   vm?: Component | null
-  expression: string
+  expression: string  // 关联表达式，或渲染
   cb: Function
   id: number
   deep: boolean
   user: boolean
-  lazy: boolean
+  lazy: boolean  // 计算属性，和watch 来控制不让watch立即执行
   sync: boolean
   dirty: boolean
   active: boolean
   deps: Array<Dep>
+   // vue中使用了二次提交的概念 ；
+   //  每次数据渲染或计算访问时，访问响应式数据，依赖收集；
+   // 关联watcher与dep；
+   // 数据发生变化是，根据dep找到关联的watcher，依次调用update；
+   // 执行 完成后清空watcher
   newDeps: Array<Dep>
   depIds: SimpleSet
   newDepIds: SimpleSet
-  before?: Function
+  before?: Function // Vue构造函数的时候，传入的watch
   onStop?: Function
   noRecurse?: boolean
-  getter: Function
-  value: any
+  getter: Function // 渲染函数或计算函数
+  value: any // 如果是渲染函数，value无效，如果是计算属性，就会有一个值
 
   // dev only
   onTrack?: ((event: DebuggerEvent) => void) | undefined
@@ -186,11 +191,11 @@ export default class Watcher implements DepTarget {
    */
   update() {
     /* istanbul ignore else */
-    if (this.lazy) {
+    if (this.lazy) { // 主要用户计算属性，一般用于计算
       this.dirty = true
-    } else if (this.sync) {
+    } else if (this.sync) { // 同步，主要用户SSR
       this.run()
-    } else {
+    } else { // 浏览器中的异步运行
       queueWatcher(this)
     }
   }
